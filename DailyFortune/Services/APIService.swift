@@ -61,6 +61,15 @@ final class APIService {
         return formatter
     }()
 
+    private static let iso8601NoTimezone: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+
     private let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         // Use a custom decoding strategy
@@ -74,6 +83,11 @@ final class APIService {
             }
             // If that fails, try parsing with the non-fractional formatter
             if let date = APIService.iso8601.date(from: dateString) {
+                return date
+            }
+            
+            // MySQL DateTime returns "2026-09-24T12:53:50" (no timezone)
+            if let date = APIService.iso8601NoTimezone.date(from: dateString) {
                 return date
             }
             
