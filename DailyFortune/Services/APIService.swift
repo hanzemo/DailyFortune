@@ -34,7 +34,7 @@ final class APIService {
     private init() {}
 
     // MARK: - Private Properties
-    private let baseURL = URL(string: "https://api.ys.oftx.top")!
+    private let baseURL = URL(string: "http://186.241.81.212:8000")!
     
     // --- FINAL AND ROBUST FIX START ---
     // The API returns two slightly different ISO8601 date formats.
