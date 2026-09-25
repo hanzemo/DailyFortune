@@ -58,6 +58,15 @@ struct MainTabView: View {
                         Label("设置", systemImage: "gear")
                     }
             }
+            
+            if authManager.currentUser?.role == "admin" {
+                NavigationStack {
+                    AdminUserListView()
+                }
+                .tabItem {
+                    Label("管理", systemImage: "person.2.badge.gearshape")
+                }
+            }
         }
     }
 }
