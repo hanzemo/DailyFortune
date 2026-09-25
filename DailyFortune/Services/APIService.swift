@@ -65,7 +65,7 @@ final class APIService {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         formatter.calendar = Calendar(identifier: .iso8601)
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
