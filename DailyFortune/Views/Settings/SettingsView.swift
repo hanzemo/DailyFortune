@@ -5,6 +5,7 @@ import UIKit
 @MainActor
 final class SettingsViewModel: ObservableObject {
     @Published var displayName: String = ""
+    @Published var email: String = ""
     @Published var bio: String = ""
     @Published var avatarUrl: String = ""
     @Published var backgroundUrl: String = ""
@@ -22,7 +23,8 @@ final class SettingsViewModel: ObservableObject {
     var hasChanges: Bool {
         guard let user = initialUser else { return false }
         
-        return displayName != user.displayName ||
+        return email != user.email ||
+               displayName != user.displayName ||
                bio != user.bio ||
                avatarUrl != user.avatarUrl ||
                backgroundUrl != user.backgroundUrl ||
@@ -34,6 +36,7 @@ final class SettingsViewModel: ObservableObject {
 
     func load(user: UserMeProfile) {
         self.displayName = user.displayName
+        self.email = user.email
         self.bio = user.bio
         self.avatarUrl = user.avatarUrl
         self.backgroundUrl = user.backgroundUrl
@@ -58,6 +61,7 @@ final class SettingsViewModel: ObservableObject {
         
         let payload = UserUpdatePayload(
             displayName: displayName,
+            email: email,
             bio: bio,
             avatarUrl: avatarUrl,
             backgroundUrl: backgroundUrl,
@@ -87,6 +91,7 @@ struct SettingsView: View {
     @EnvironmentObject var authManager: AuthManager
     @State private var isChangePasswordSheetPresented = false
     @State private var showDiscardConfirm = false
+    @State private var showDeleteConfirm = false
     // --- 新增代码 1: 用于跟踪键盘可见性的状态变量 ---
     @State private var isKeyboardVisible = false
 
@@ -145,6 +150,9 @@ struct SettingsView: View {
                 Section {
                     Button("登出", role: .destructive) {
                         authManager.logout()
+                    Button("注销账号", role: .destructive) {
+                        showDeleteConfirm = true
+                    }
                     }
                 }
             }

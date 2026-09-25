@@ -1,5 +1,9 @@
 import Foundation
 
+enum LeaderboardPeriod: String {
+    case today, week, month, year
+}
+
 // MARK: - APIError Enum
 enum APIError: Error, LocalizedError {
     case invalidURL
@@ -289,11 +293,31 @@ final class APIService {
         try await request(endpoint: "/fortune/draw", method: "POST", auth: true)
     }
     
-    func getLeaderboard() async throws -> [LeaderboardGroup] {
-        try await request(endpoint: "/fortune/leaderboard")
+    func getLeaderboard(period: LeaderboardPeriod = .today) async throws -> [LeaderboardGroup] {
+        try await request(endpoint: "/fortune/leaderboard?period=\(period.rawValue)")
     }
     
     // MARK: - Admin Endpoints
+    func deleteMyAccount() async throws {
+        try await requestNoContent(endpoint: "/users/me", method: "DELETE")
+    }
+
+    func adminUpdateUser(userId: String, payload: UserUpdatePayload) async throws {
+        try await requestNoContent(endpoint: "/admin/users/\(userId)", method: "PATCH", body: payload)
+    }
+
+    func adminUpdateRole(userId: String, role: String) async throws {
+        try await requestNoContent(endpoint: "/admin/users/\(userId)/role", body: ["role": role])
+    }
+
+    func adminDeleteUser(userId: String) async throws {
+        try await requestNoContent(endpoint: "/admin/users/\(userId)", method: "DELETE")
+    }
+
+    func adminResetPassword(userId: String, newPassword: String) async throws {
+        try await requestNoContent(endpoint: "/admin/users/\(userId)/reset-password", body: ["new_password": newPassword])
+    }
+
     func getAllUsers() async throws -> [UserMeProfile] {
         try await request(endpoint: "/admin/users")
     }

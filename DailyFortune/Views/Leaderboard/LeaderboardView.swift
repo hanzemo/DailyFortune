@@ -6,6 +6,7 @@ final class LeaderboardViewModel: ObservableObject {
     @Published var leaderboard: [LeaderboardGroup] = []
     @Published var isLoading = true
     @Published var errorMessage: String?
+    @Published var period: LeaderboardPeriod = .today
     
     func fetchLeaderboard() {
         // 只有在首次加载、数据为空时，才将 isLoading 设为 true 以显示全屏加载器。
@@ -16,7 +17,7 @@ final class LeaderboardViewModel: ObservableObject {
         errorMessage = nil
         Task {
             do {
-                self.leaderboard = try await APIService.shared.getLeaderboard()
+                self.leaderboard = try await APIService.shared.getLeaderboard(period: self.period)
             } catch {
                 self.errorMessage = error.localizedDescription
             }
@@ -42,7 +43,19 @@ struct LeaderboardView: View {
                 } else if viewModel.leaderboard.isEmpty {
                     Text("今天还没有人抽取运势。")
                 } else {
-                    List {
+                    Picker("周期", selection: $viewModel.period) {
+                Text("今日").tag(LeaderboardPeriod.today)
+                Text("本周").tag(LeaderboardPeriod.week)
+                Text("本月").tag(LeaderboardPeriod.month)
+                Text("本年").tag(LeaderboardPeriod.year)
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .onChange(of: viewModel.period) { _ in
+                viewModel.fetchLeaderboard()
+            }
+
+            List {
                         ForEach(viewModel.leaderboard) { group in
                             Section(header: Text(group.fortune).font(.headline)) {
                                 ForEach(group.users) { user in

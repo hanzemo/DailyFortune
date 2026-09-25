@@ -5,6 +5,9 @@ struct AdminUserListView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var editingUser: UserMeProfile?
+    @State private var showEditSheet = false
+    @State private var showResetPassword = false
+    @State private var newPassword = ""
 
     var body: some View {
         List {
@@ -60,6 +63,21 @@ struct AdminUserListView: View {
             Button(user.isHidden ? "取消隐藏" : "隐藏用户") {
                 Task { await toggleVisibility(user) }
             }
+            Button("编辑资料") {
+                showEditSheet = true
+            }
+            Button("设为管理员") {
+                Task { await setRole(user, "admin") }
+            }
+            Button("设为普通用户") {
+                Task { await setRole(user, "user") }
+            }
+            Button("重置密码") {
+                showResetPassword = true
+            }
+            Button("删除用户", role: .destructive) {
+                Task { await deleteUser(user) }
+            }
             Button("取消", role: .cancel) {}
         }
         .alert("错误", isPresented: Binding(
@@ -92,6 +110,34 @@ struct AdminUserListView: View {
         }
     }
 
+    func setRole(_ user: UserMeProfile, _ role: String) async {
+        do {
+            try await APIService.shared.adminUpdateRole(userId: user.id, role: role)
+            await loadUsers()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func deleteUser(_ user: UserMeProfile) async {
+        do {
+            try await APIService.shared.adminDeleteUser(userId: user.id)
+            await loadUsers()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func resetPassword(_ user: UserMeProfile) async {
+        do {
+            try await APIService.shared.adminResetPassword(userId: user.id, newPassword: newPassword)
+            newPassword = ""
+            await loadUsers()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func toggleVisibility(_ user: UserMeProfile) async {
         do {
             try await APIService.shared.updateUserVisibility(userId: user.id, isHidden: !user.isHidden)
@@ -100,4 +146,21 @@ struct AdminUserListView: View {
             errorMessage = error.localizedDescription
         }
     }
+
+        .sheet(isPresented: $showEditSheet) {
+            if let user = editingUser {
+                AdminEditUserView(user: user) {
+                    Task { await loadUsers() }
+                }
+            }
+        }
+        .alert("重置密码", isPresented: $showResetPassword) {
+            TextField("新密码", text: $newPassword)
+            Button("确定") {
+                if let user = editingUser {
+                    Task { await resetPassword(user) }
+                }
+            }
+            Button("取消", role: .cancel) { newPassword = "" }
+        }
 }

@@ -26,6 +26,8 @@ struct UserMeProfile: Codable, Identifiable, Hashable, Equatable {
     let tags: [String]
     let qq: Int?
     let useQqAvatar: Bool
+    let streak: Int?
+    let fortuneCounts: [String: Int]?
 
     enum CodingKeys: String, CodingKey {
         case id, email, role, language, timezone, username, bio, tags, qq, status
@@ -39,6 +41,8 @@ struct UserMeProfile: Codable, Identifiable, Hashable, Equatable {
         case todaysFortune = "todays_fortune"
         case isHidden = "is_hidden"
         case useQqAvatar = "use_qq_avatar"
+        case streak
+        case fortuneCounts = "fortune_counts"
     }
 
     func getDisplayAvatarUrl() -> URL? {
@@ -74,6 +78,8 @@ struct UserPublicProfile: Codable, Identifiable, Hashable, Equatable {
     let tags: [String]
     let qq: Int?
     let useQqAvatar: Bool
+    let streak: Int?
+    let fortuneCounts: [String: Int]?
     
     enum CodingKeys: String, CodingKey {
         case username, bio, tags, qq, status
@@ -87,6 +93,8 @@ struct UserPublicProfile: Codable, Identifiable, Hashable, Equatable {
         case todaysFortune = "todays_fortune"
         case isHidden = "is_hidden"
         case useQqAvatar = "use_qq_avatar"
+        case streak
+        case fortuneCounts = "fortune_counts"
     }
     
     func getDisplayAvatarUrl() -> URL? {
@@ -188,6 +196,7 @@ struct APIErrorResponse: Codable {
 // MARK: - Update Payloads
 struct UserUpdatePayload: Codable {
     var displayName: String? = nil
+    var email: String? = nil
     var bio: String? = nil
     var avatarUrl: String? = nil
     var backgroundUrl: String? = nil
@@ -198,6 +207,7 @@ struct UserUpdatePayload: Codable {
     
     enum CodingKeys: String, CodingKey {
         case displayName = "display_name"
+        case email
         case bio
         case avatarUrl = "avatar_url"
         case backgroundUrl = "background_url"

@@ -14,7 +14,7 @@ final class ProfileViewModel: ObservableObject {
     
     var displayableProfile: UserPublicProfile? {
         if let p = profile as? UserMeProfile {
-            return UserPublicProfile(username: p.username, displayName: p.displayName, bio: p.bio, avatarUrl: p.avatarUrl, backgroundUrl: p.backgroundUrl, registrationDate: p.registrationDate, lastActiveDate: p.lastActiveDate, totalDraws: p.totalDraws, hasDrawnToday: p.hasDrawnToday, todaysFortune: p.todaysFortune, status: p.status, isHidden: p.isHidden, tags: p.tags, qq: p.qq, useQqAvatar: p.useQqAvatar)
+            return UserPublicProfile(username: p.username, displayName: p.displayName, bio: p.bio, avatarUrl: p.avatarUrl, backgroundUrl: p.backgroundUrl, registrationDate: p.registrationDate, lastActiveDate: p.lastActiveDate, totalDraws: p.totalDraws, hasDrawnToday: p.hasDrawnToday, todaysFortune: p.todaysFortune, status: p.status, isHidden: p.isHidden, tags: p.tags, qq: p.qq, useQqAvatar: p.useQqAvatar, streak: p.streak, fortuneCounts: p.fortuneCounts)
         }
         return profile as? UserPublicProfile
     }
@@ -228,10 +228,34 @@ struct ProfileContentView: View {
                 statItem(value: profile.registrationDate.toShortDateString(), label: "加入于")
                 Spacer()
                 statItem(value: profile.lastActiveDate.timeAgoDisplay(), label: "最近活跃")
+                Spacer()
+                statItem(value: "\(profile.streak ?? 0)", label: "连续天数")
             }
             .padding()
             .background(.thinMaterial)
             .cornerRadius(12)
+            
+            if let counts = profile.fortuneCounts, !counts.isEmpty {
+                Text("运势统计")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(counts.sorted(by: { $0.value > $1.value }), id: \.key) { key, value in
+                        HStack {
+                            Text(key)
+                                .fontWeight(.medium)
+                                .foregroundColor(Constants.FortuneColors.color(for: key))
+                            Spacer()
+                            Text("\(value) 次")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding()
+                .background(.thinMaterial)
+                .cornerRadius(12)
+            }
             
             Text("运势历史 (近一年)")
                 .font(.title2)
