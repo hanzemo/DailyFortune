@@ -22,7 +22,7 @@ final class RegisterViewModel: ObservableObject {
         Task {
             do {
                 let response = try await APIService.shared.register(username: username, email: email, password: password)
-                authManager.login(token: response.accessToken, user: response.user)
+                authManager.login(accessToken: response.accessToken, refreshToken: response.refreshToken, user: response.user)
             } catch {
                 errorMessage = error.localizedDescription
             }
