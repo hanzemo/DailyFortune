@@ -6,6 +6,7 @@ struct AdminUserListView: View {
     @State private var errorMessage: String?
     @State private var editingUser: UserMeProfile?
     @State private var showEditSheet = false
+    @State private var editTarget: UserMeProfile?
     @State private var showResetPassword = false
     @State private var newPassword = ""
 
@@ -64,6 +65,7 @@ struct AdminUserListView: View {
                 Task { await toggleVisibility(user) }
             }
             Button("编辑资料") {
+                editTarget = user
                 showEditSheet = true
             }
             Button("设为管理员") {
@@ -89,7 +91,7 @@ struct AdminUserListView: View {
             Text(errorMessage ?? "")
         }
         .sheet(isPresented: $showEditSheet) {
-            if let user = editingUser {
+            if let user = editTarget {
                 AdminEditUserView(user: user) {
                     Task { await loadUsers() }
                 }
