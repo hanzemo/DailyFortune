@@ -109,7 +109,12 @@ final class APIService {
                                        body: (any Encodable)? = nil,
                                        auth: Bool = true) async throws -> T {
         
-        let url = baseURL.appendingPathComponent(endpoint)
+        let url: URL
+        if endpoint.contains("?") {
+            url = URL(string: baseURL.absoluteString + endpoint)!
+        } else {
+            url = baseURL.appendingPathComponent(endpoint)
+        }
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -154,7 +159,12 @@ final class APIService {
                                   body: (any Encodable)? = nil,
                                   auth: Bool = true) async throws {
                                     
-        let url = baseURL.appendingPathComponent(endpoint)
+        let url: URL
+        if endpoint.contains("?") {
+            url = URL(string: baseURL.absoluteString + endpoint)!
+        } else {
+            url = baseURL.appendingPathComponent(endpoint)
+        }
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
