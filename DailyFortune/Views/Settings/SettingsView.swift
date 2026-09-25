@@ -150,9 +150,9 @@ struct SettingsView: View {
                 Section {
                     Button("登出", role: .destructive) {
                         authManager.logout()
+                    }
                     Button("注销账号", role: .destructive) {
                         showDeleteConfirm = true
-                    }
                     }
                 }
             }

@@ -88,6 +88,22 @@ struct AdminUserListView: View {
         } message: {
             Text(errorMessage ?? "")
         }
+        .sheet(isPresented: $showEditSheet) {
+            if let user = editingUser {
+                AdminEditUserView(user: user) {
+                    Task { await loadUsers() }
+                }
+            }
+        }
+        .alert("重置密码", isPresented: $showResetPassword) {
+            TextField("新密码", text: $newPassword)
+            Button("确定") {
+                if let user = editingUser {
+                    Task { await resetPassword(user) }
+                }
+            }
+            Button("取消", role: .cancel) { newPassword = "" }
+        }
     }
 
     func loadUsers() async {
@@ -144,22 +160,6 @@ struct AdminUserListView: View {
             await loadUsers()
         } catch {
             errorMessage = error.localizedDescription
-        }
-        .sheet(isPresented: $showEditSheet) {
-            if let user = editingUser {
-                AdminEditUserView(user: user) {
-                    Task { await loadUsers() }
-                }
-            }
-        }
-        .alert("重置密码", isPresented: $showResetPassword) {
-            TextField("新密码", text: $newPassword)
-            Button("确定") {
-                if let user = editingUser {
-                    Task { await resetPassword(user) }
-                }
-            }
-            Button("取消", role: .cancel) { newPassword = "" }
         }
     }
 
