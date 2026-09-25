@@ -145,8 +145,6 @@ struct AdminUserListView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
-    }
-
         .sheet(isPresented: $showEditSheet) {
             if let user = editingUser {
                 AdminEditUserView(user: user) {
@@ -163,4 +161,6 @@ struct AdminUserListView: View {
             }
             Button("取消", role: .cancel) { newPassword = "" }
         }
+    }
+
 }
