@@ -61,15 +61,6 @@ final class APIService {
         return formatter
     }()
 
-    private static let iso8601NoTimezone: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        formatter.calendar = Calendar(identifier: .iso8601)
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter
-    }()
-
     private let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         // Use a custom decoding strategy
@@ -83,11 +74,6 @@ final class APIService {
             }
             // If that fails, try parsing with the non-fractional formatter
             if let date = APIService.iso8601.date(from: dateString) {
-                return date
-            }
-            
-            // MySQL DateTime returns "2026-09-24T12:53:50" (no timezone)
-            if let date = APIService.iso8601NoTimezone.date(from: dateString) {
                 return date
             }
             
@@ -227,38 +213,6 @@ final class APIService {
     func register(username: String, email: String, password: String) async throws -> AuthResponse {
         let body = ["username": username, "email": email, "password": password]
         return try await request(endpoint: "/auth/register", method: "POST", body: body, auth: false)
-    }
-
-    // MARK: - Refresh Token
-    struct RefreshResponse: Codable {
-        let accessToken: String
-        let refreshToken: String
-        let tokenType: String
-
-        enum CodingKeys: String, CodingKey {
-            case accessToken = "access_token"
-            case refreshToken = "refresh_token"
-            case tokenType = "token_type"
-        }
-    }
-
-    func refreshToken(_ refreshToken: String) async throws -> RefreshResponse {
-        let url = baseURL.appendingPathComponent("/auth/refresh")
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body: [String: String] = ["refresh_token": refreshToken]
-        request.httpBody = try JSONEncoder().encode(body)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
-        }
-        guard (200...299).contains(httpResponse.statusCode) else {
-            throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Refresh failed")
-        }
-        return try decoder.decode(RefreshResponse.self, from: data)
     }
 
     // MARK: - User Endpoints

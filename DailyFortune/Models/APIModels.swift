@@ -105,11 +105,13 @@ struct UserPublicProfile: Codable, Identifiable, Hashable, Equatable {
 // MARK: - Auth Models
 struct AuthResponse: Codable {
     let accessToken: String
+    let refreshToken: String
     let tokenType: String
     let user: UserMeProfile
     
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
+        case refreshToken = "refresh_token"
         case tokenType = "token_type"
         case user
     }

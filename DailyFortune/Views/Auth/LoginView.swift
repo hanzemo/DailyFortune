@@ -27,7 +27,7 @@ final class LoginViewModel: ObservableObject {
         Task {
             do {
                 let response = try await APIService.shared.login(username: username, password: password)
-                authManager.login(token: response.accessToken, user: response.user)
+                authManager.login(accessToken: response.accessToken, refreshToken: response.refreshToken, user: response.user)
                 completion()
             } catch {
                 self.errorMessage = error.localizedDescription
